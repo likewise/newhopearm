@@ -20,16 +20,16 @@ depending on the script uploaded, we provide two python scripts.
 These can be found in the 'scripts' subdirectory.
 
 * Proof-of-concept binaries
-    + Server test: `make runServer` invokes the NewHope server side test. It loads the code into the device memory and calls the test_server python-script to test the communication and computations of the server-side code on the device against results taken from the reference implemtentation. 
-    + Client test: `make runClient` invokes the NewHope client side test. It loads the code into the device memory and calls the test_client python-script to test the communication and computations of the client-side code on the device against results taken from the reference implemtentation. 
-* Measurment binaries
+    + Server test: `make runServer` invokes the NewHope server side test. It loads the code into the device memory and calls the test_server python-script to test the communication and computations of the server-side code on the device against results taken from the reference implementation. 
+    + Client test: `make runClient` invokes the NewHope client side test. It loads the code into the device memory and calls the test_client python-script to test the communication and computations of the client-side code on the device against results taken from the reference implementation. 
+* Measurement binaries
     + Speed measurements: `make runSpeed` invokes cycle count measurements. It loads the code into the device memory and calls the monitor script to print the output of the device.
     + Memory usage measurement: `make runMemsize` invokes the memory measurements. The ROM usage can be determined by running `arm-none-eabi-size -t tests/libnewhopearm.a`.
 
 # Communication-API
 
 
-If one decides to implement differnt correspondance software for the 
+If one decides to implement different correspondence software for the 
 Cortex-M0, the following has to be assumed:
 All values send and received are bytes.
 A GUARD parameter is used, it has the decimal value 10.
@@ -56,7 +56,7 @@ be removed from 'newhope.c' along with the constant character array `key_stored`
 
 During testing we encountered two pitfalls the code can run into.
 
-* We experienced that the host scripts and the code on the Cortex-M0 get out of sync. In this case `make runClient` should be called, which will pompt `> Waiting for signal..`. If the rest button is pressed the host and Cortex-M0 should be in sync again. 
+* We experienced that the host scripts and the code on the Cortex-M0 get out of sync. In this case `make runClient` should be called, which will prompt `> Waiting for signal..`. If the rest button is pressed the host and Cortex-M0 should be in sync again. 
 
 * We experienced that the output of `make runMemsize` is not printed. In this case we found that calling the `make runSpeed`,`make runMemsize`,`make runMemsize` solves that issue. 
 

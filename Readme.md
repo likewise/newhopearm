@@ -15,7 +15,7 @@ Within this repository, we provide two cycle count optimized versions of the key
 * ARMv6-M 
 * ARMv7-M
 
-As representatives for the architectures we chose the ARM Cortex-M0 for the ARMv6-M architecture and the ARM Cortex-M4 for the ARMv7-M architecture. As we had to use two STMicroelectronics development boards with their own peculiarities we provide detailed instructions per target architecture in the related subdirectories. 
+As representatives for the architectures we chose the ARM Cortex-M0 for the ARMv6-M architecture and the ARM Cortex-M4 for the ARMv7-M architecture. As we had to use two STMicroelectronics development boards with their own peculiarities we provide detailed instructions per target architecture in the related subdirectory. 
 
 # API
 
@@ -25,10 +25,10 @@ The following API functions are provided for the key exchange:
 * `newhope_sharedb` (Client Side)
 * `newhope_shareda` (Server Side)
 
-Definitins of these functions can be found in the `newhope.[c,h]` files in both architecture specific directories.
+Definitions of these functions can be found in the `newhope.[c,h]` files in both architecture specific directories.
 
 
-This repository also provides optimized implementations of core building blocks gnerally used in ring-learning-with-error schemes, such as:
+This repository also provides optimized implementations of core building blocks generally used in ring-learning-with-error schemes, such as:
 
 * The Number Theoretic Transform for n=1024 and q=12289 (`poly_ntt, poly_invntt`)
 * The centered binomial noise generation for secrets (`poly_getnoise` for _ChaCha20_ implementation, `poly_getnoise_rng` for built-in RNG implementation on the Cortex-M4)
@@ -88,7 +88,7 @@ We based our work on the following implementations:
 * Both, `stm32f0_wrapper.c` and `stm32_wrapper.h` are taken from 
 [Joost Rijneveld's](https://github.com/joostrijneveld/STM32-getting-started) implementation. 
 
-* The libopencm3 directories and developmenmt board specific linker scripts are 
+* The libopencm3 directories and development board specific linker scripts are 
 from the [Libopencm3 Library](http://www.libopencm3.org/wiki/Main_Page),
 we only modified includes to provide a stand alone version.
 
@@ -107,7 +107,7 @@ The `keccakf1600.s` files are architecture specific and taken from the [Keccak C
 
 The software for the Cortex-M0 provided in the cm0 subdirectory is a proof of concept 
 and not intended for actual deployment. The random 
-seed generation needs to be apapted such that a true random source 
+seed generation needs to be adapted such that a true random source 
 is used for the seeds. This could be realized by integrating the 
 random number generator into the 'randombytes' function inside 
 'randombytes.c'.
