@@ -52,12 +52,14 @@ be removed from 'newhope.c' along with the constant character array `key_stored`
 `test/client.c` and `test/server.c` files. The server side performs the computations from the API function `newhope_keygen` before it sends the message A and the computations from the API function `newhope_shareda` after it received message B. The client side performs the computations from the API function `newhope_sharedb` after it received message A and before it sends message B. 
 
 
-# Troubleshooting 
+# Solutions for possible communication issues 
 Due to the usage of two different libraries we encountered two pitfalls the code can run into. These errors only occur during testing. A single library usage for a real world application would not suffer these shortcomings.
 
-* We experienced that the host scripts and the code on the Cortex-M0 get out of sync. In this case `make runClient` should be called, which will prompt `> Waiting for signal..`. If the rest button is pressed the host and Cortex-M0 should be in sync again. 
 
-* We experienced that the output of `make runMemsize` is not printed. In this case we found that calling the `make runSpeed`,`make runMemsize`,`make runMemsize` solves that issue. 
+
+* If the host and the Cortex-M0 get out of sync, `make runClient` should be called.  The terminal will prompt `> Waiting for signal..`. If the reset button is pressed the host and the Cortex-M0 should be in sync again. 
+
+* If the output of `make runMemsize` is not printed, calling `make runSpeed` and two consecutive times `make runMemsize` should solve that issue. 
 
 
   
