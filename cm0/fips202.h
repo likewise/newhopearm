@@ -3,7 +3,7 @@
 
 #define SHAKE128_RATE 168
 #define SHA3_256_RATE 136
-#include <stdint.h>
+
 extern void KeccakF1600_StateInitialize(void *state);
 extern void KeccakF1600_StateXORBytes(void *state, const unsigned char *data, unsigned int offset, unsigned int length);
 extern void KeccakF1600_StatePermute( void *state );

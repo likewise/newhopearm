@@ -17,7 +17,7 @@ All carefully optimized assembly implementations can be found in files starting 
 
 To interact with the Cortex-M0 either in server or in client mode 
 depending on the script uploaded, we provide two python scripts. 
-These can be found in the 'scripts' subdirectory.
+These can be found in the 'scripts' sub-directory.
 
 * Proof-of-concept binaries
     + Server test: `make runServer` invokes the NewHope server side test. It loads the code into the device memory and calls the test_server python-script to test the communication and computations of the server-side code on the device against results taken from the reference implementation. 
@@ -53,8 +53,7 @@ be removed from 'newhope.c' along with the constant character array `key_stored`
 
 
 # Troubleshooting 
-
-During testing we encountered two pitfalls the code can run into.
+Due to the usage of two different libraries we encountered two pitfalls the code can run into. These errors only occur during testing. A single library usage for a real world application would not suffer these shortcomings.
 
 * We experienced that the host scripts and the code on the Cortex-M0 get out of sync. In this case `make runClient` should be called, which will prompt `> Waiting for signal..`. If the rest button is pressed the host and Cortex-M0 should be in sync again. 
 

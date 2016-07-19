@@ -13,6 +13,8 @@ static void encode_ap(poly *pk, const unsigned char *seed)
   }
 }
 
+
+
 static void decode_ap(poly *pk, unsigned char *seed)
 {
   int i;
@@ -55,7 +57,8 @@ static void decode_bp(poly *b, poly *c)
   poly_amplify(b);
 }
 
-
+// non static just for cycle count
+//static void gen_a(poly *a, const unsigned char *seed)
 void gen_a(poly *a, const unsigned char *seed)
 {
     poly_uniform(a,seed);

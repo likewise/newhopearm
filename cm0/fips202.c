@@ -5,7 +5,7 @@
  * from https://twitter.com/tweetfips202
  * by Gilles Van Assche, Daniel J. Bernstein, and Peter Schwabe */
 
-
+#include <stdint.h>
 #include "fips202.h"
 
 

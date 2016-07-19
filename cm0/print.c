@@ -1,7 +1,7 @@
-#include "libs/stm32f0xx/stm32f0xx.h"
-#include "libs/stm32f0xx/stm32f0xx_gpio.h"
-#include "libs/stm32f0xx/stm32f0xx_rcc.h"
-#include "libs/stm32f0xx/stm32f0xx_usart.h"
+#include "stm32f0xx/stm32f0xx.h"
+#include "stm32f0xx/stm32f0xx_gpio.h"
+#include "stm32f0xx/stm32f0xx_rcc.h"
+#include "stm32f0xx/stm32f0xx_usart.h"
 #include <stdio.h>
 
 static int uart_initialized = 0;
@@ -104,5 +104,9 @@ void print_stack(const char *primitive, const unsigned int bytes, unsigned int s
   printllu(stack);
     print(" stack bytes\n");
 }
+
+
+
+
 
 

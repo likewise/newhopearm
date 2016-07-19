@@ -68,7 +68,7 @@ void newhope_keygen(unsigned char *send, poly *sk)
   poly_getnoise(&pk,noiseseed,1);
   poly_ntt(&pk); //unsigned
 
-  poly_pointwise(&a,sk,&a); //unsigned
+  poly_pointwise(&a,&a,sk); //unsigned
   poly_add(&pk,&a,&pk); //unsigned
   encode_a(send, &pk, seed);
 }

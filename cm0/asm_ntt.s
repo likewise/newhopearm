@@ -822,6 +822,166 @@ endntt:
 	bx lr
 
 
+@----------------------------------------------------------------------------
+@
+@ void asm_mulcoef_otf(uint16_t* poly, const uint16_t* factors);
+@
+
+.global	asm_mulcoef_otf
+.type	asm_mulcoef_otf, %function
+asm_mulcoef_otf:
+	push {r4-r7,lr}
+    mov r3,r8
+    mov r4,r9
+    mov r5,r10
+    mov r6,r11
+    mov r7,r12
+    push {r3-r7}
+    
+
+    MOV r4,#3
+    LSL r4,#12
+    ADD r4,#1
+	MOV r9,r4
+
+    MOV r4,#1
+    LSL r4,#18
+    SUB r4,#1
+	MOV r10,r4
+    
+    mov r8,r0
+    mov r4,#1
+    lsl r4,#10
+    add r8,r4
+
+    mov r11,r1
+
+loopmcotf:
+    mov r12,r0
+
+    ldm r0,{r2,r3}
+    ldm r1,{r4,r5}
+
+	UXTH r6,r2
+	LSR r2,#16
+
+	UXTH r7,r4
+	LSR r4,#16
+
+    mul r6,r7
+    mul r2,r4
+
+    mov r4,r10
+    mov r0,r9
+
+    montgomery 	r7, r0, r4, r6
+    montgomery 	r7, r0, r4, r2
+
+    lsl r2,#16
+    orr r2,r6
+
+
+	UXTH r6,r3
+	LSR r3,#16
+
+	UXTH r7,r5
+	LSR r5,#16
+
+    mul r6,r7
+    mul r3,r5
+
+
+    montgomery 	r7, r0, r4, r6
+    montgomery 	r7, r0, r4, r3
+
+    lsl r3,#16
+    orr r3,r6
+
+    mov r0,r12
+
+    stm r0, {r2,r3}
+            
+    cmp r0,r8
+    blt loopmcotf
+
+@end first loop
+
+
+    mov r1,r11
+
+    mov r4,#1
+    lsl r4,#10 
+    add r8,r4
+
+loopmc1:
+    mov r12,r0
+
+    ldm r0,{r2,r3}
+    ldm r1,{r4,r5}
+
+	UXTH r6,r2
+	LSR r2,#16
+
+	UXTH r7,r4
+	LSR r4,#16
+
+    mul r6,r7
+    mul r2,r4
+
+    mov r0,#7
+    mul r6,r0
+    mul r2,r0
+
+    mov r4,r10
+    mov r0,r9
+
+    montgomery 	r7, r0, r4, r6
+    montgomery 	r7, r0, r4, r2
+
+    lsl r2,#16
+    orr r2,r6
+
+
+	UXTH r6,r3
+	LSR r3,#16
+
+	UXTH r7,r5
+	LSR r5,#16
+    
+
+
+    mul r6,r7
+    mul r3,r5
+
+    mov r0,#7
+    mul r6,r0
+    mul r3,r0
+
+    mov r0,r9
+
+    montgomery 	r7, r0, r4, r6
+    montgomery 	r7, r0, r4, r3
+
+    lsl r3,#16
+    orr r3,r6
+
+    mov r0,r12
+
+    stm r0, {r2,r3}
+            
+    cmp r0,r8
+    blt loopmc1
+
+    pop {r3-r7}
+
+    mov r8,r3
+    mov r9,r4
+    mov r10,r5
+    mov r11,r6
+    mov r12,r7
+
+	pop {r4-r7,pc}
+
 
 @----------------------------------------------------------------------------
 @
@@ -910,18 +1070,6 @@ loopmc:
 
 	pop {r4-r7,pc}
 
-.global	barrett_reduce
-.type	barrett_reduce, %function
-barrett_reduce:
-    push {r1-r7,lr}
-	MOV r7,#3
-    LSL r7,#12
-    ADD r7,#1
-	barrett r0
-	pop {r1-r7,pc}
-
-
-
 
 /* 
 **************************************************************
@@ -997,6 +1145,7 @@ test_doublefly:
     mov r14,r7
 
 	pop {r4-r7,pc}
+
 
 
 

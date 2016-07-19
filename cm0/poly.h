@@ -13,7 +13,7 @@ typedef struct {
 
 extern void asm_ntt(uint16_t* poly, const uint16_t* omegas);
 extern void asm_mulcoef(uint16_t* poly, const uint16_t* factors);
-extern uint16_t barrett_reduce(uint16_t a);
+
 
 void poly_uniform(poly *a, const unsigned char *seed);
 void poly_getnoise(poly *r, unsigned char *seed, unsigned char nonce);

@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "randombytes.h"
 
-/* it's really stupid that there isn't a syscall for this */
+/* Should be replaced by a secure source of randomness followed by a call to SHA-3*/
 
 
 void randombytes(unsigned char *x,unsigned long long xlen)
@@ -30,6 +30,8 @@ void randombytes(unsigned char *x,unsigned long long xlen)
         x[i] = c[i]; 
     }
   }
+
+  //return sha3256(x, result_of_RNG, 32);
 
 }
 

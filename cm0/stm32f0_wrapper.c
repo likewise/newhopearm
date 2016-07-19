@@ -1,9 +1,9 @@
-#include "libs/libopencm3/include/rcc.h"
-#include "libs/libopencm3/include/gpio.h"
-#include "libs/libopencm3/include/usart.h"
-#include "libs/libopencm3/include/nvic.h"
-#include "libs/libopencm3/include/dma.h"
-#include "libs/libopencm3/include/systick.h"
+#include "libopencm3/rcc.h"
+#include "libopencm3/gpio.h"
+#include "libopencm3/usart.h"
+#include "libopencm3/nvic.h"
+#include "libopencm3/dma.h"
+#include "libopencm3/systick.h"
 #include "stm32wrapper.h"
 
 void clock_setup(void)

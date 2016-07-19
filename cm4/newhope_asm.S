@@ -7,9 +7,8 @@
     .endm
 
 	.macro barrett a, q, t
-	  lsl \t,\a,#2
-	  add \t,\a
-	  lsr \t,#16
+	  mov \t,#5
+	  smulwb \t,\a,\t
 	  mls \a,\t,\q,\a
 	.endm
 	.macro butterfly a0,a1,q,t
@@ -35,7 +34,7 @@
 	.global	ntt
 	.type	ntt, %function
 	//
-    .align 2
+    .align 4
 	.syntax unified
 	.cpu cortex-m4
     // r0=&a, r1=&omegas
@@ -408,6 +407,97 @@ barrett_reduce:
 	barrett r0,r2,r1
 	
 	pop {r1-r12,pc}
+	
+	.global	mul_coeff
+	.type	mul_coeff, %function
+	// Multiplication with psis with using omegas
+	// unaligned loads and store add one cycle each block
+    .align 4
+	.syntax unified
+	.cpu cortex-m4
+
+mul_coeff:
+    push {r0-r12,lr}
+
+    mov r2, #128
+	// set r14 as q
+	mov r14,#3
+    lsl r14,#12
+	add r14,#1
+
+	sub r12,r14,#2
+	mov r11,#7
+	add r10,r0,#1024
+looppsis1:
+    
+	ldm r0,{r3,r4}
+	ldm r1!,{r7,r8}
+	
+	smulbb r5,r3,r7
+	mul r9,r5,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r5
+	lsr r5,r9,#18
+	smultt r6,r3,r7
+	mul r9,r6,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r6
+	lsr r6,r9,#2
+	pkhbt r3, r5, r6
+	
+	smulbb r5,r4,r8
+	mul r9,r5,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r5
+	lsr r5,r9,#18
+	smultt r6,r4,r8
+	mul r9,r6,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r6
+	lsr r6,r9,#2
+	pkhbt r4, r5, r6
+
+	stm r0!,{r3,r4}
+
+
+	ldm r10,{r5,r6}
+	
+	smulbb r3,r5,r7
+	mul r3,r11
+	mul r9,r3,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r3
+	lsr r3,r9,#18
+	smultt r7,r5,r7
+	mul r7,r11
+	mul r9,r7,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r7
+	lsr r7,r9,#2
+	pkhbt r5, r3, r7
+	
+	smulbb r3,r6,r8
+	mul r3,r11
+	mul r9,r3,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r3
+	lsr r3,r9,#18
+	smultt r8,r6,r8
+	mul r8,r11
+	mul r9,r8,r12
+	ubfx r9,r9,#0,#18
+	mla r9,r9,r14,r8
+	lsr r8,r9,#2
+	pkhbt r6, r3, r8
+
+	stm r10!,{r5,r6}
+
+    sub r2,#1
+	cmp r2,#0
+	bne looppsis1
+	
+	pop {r0-r12,pc}	
+
 
 	.global	mul_coefficients
 	.type	mul_coefficients, %function
@@ -431,24 +521,24 @@ looptop:
 	ldm r0,{r3,r4}
 	ldm r1!,{r7,r8}
 	
-	smlabb r5,r3,r7,r11
+	smulbb r5,r3,r7
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	smlatt r6,r3,r7,r11
+	smultt r6,r3,r7
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
 	lsr r6,r9,#2
 	pkhbt r3, r5, r6
 	
-	smlabb r5,r4,r8,r11
+	smulbb r5,r4,r8
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	smlatt r6,r4,r8,r11
+	smultt r6,r4,r8
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
@@ -458,24 +548,24 @@ looptop:
 	ldrd r5,r6,[r0,#8]
 	ldm r1!,{r7,r8}
 	
-	smlabb r10,r5,r7,r11
+	smulbb r10,r5,r7
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	smlatt r7,r5,r7,r11
+	smultt r7,r5,r7
 	mul r9,r7,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r7
 	lsr r7,r9,#2
 	pkhbt r5, r10, r7
 	
-	smlabb r10,r6,r8,r11
+	smulbb r10,r6,r8
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	smlatt r8,r6,r8,r11
+	smultt r8,r6,r8
 	mul r9,r8,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r8
@@ -489,7 +579,7 @@ looptop:
 	bne looptop
 	
 	pop {r0-r12,pc}	
-						
+
     .global bitrev_vector
     .type bitrev_vector, %function
     .align 2
@@ -537,53 +627,51 @@ poly_pointwise:
     lsl r14,#12
 	add r14,#1
 	sub r12,r14,#2
-	mov r11,#0
+	mov r11,#3072
+	add r11,#114
 looptopp:
    	ldm r1!,{r3,r4}
 	ldm r2!,{r7,r8}
-	push {r0,r10}
-	mov r0,#12
-	lsl r0,#8
-	add r0,#114
+	push {r10}
 	
-	smlabb r5,r3,r7,r11
+	smulbb r5,r11,r7
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	mul r5,r0
+	smulbb r5,r5,r3
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	smlatt r6,r3,r7,r11
+	smulbt r6,r11,r7
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
 	lsr r6,r9,#18
-	mul r6,r0
+	smulbt r6,r6,r3
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
 	lsr r6,r9,#2
 	pkhbt r3, r5, r6
 	
-	smlabb r5,r4,r8,r11
+	smulbb r5,r11,r8
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	mul r5,r0
+	smulbb r5,r5,r4
 	mul r9,r5,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r5
 	lsr r5,r9,#18
-	smlatt r6,r4,r8,r11
+	smulbt r6,r11,r8
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
 	lsr r6,r9,#18
-	mul r6,r0
+	smulbt r6,r6,r4
 	mul r9,r6,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r6
@@ -593,50 +681,50 @@ looptopp:
 	ldrd r5,r6,[r1],#8
 	ldm r2!,{r7,r8}
 	
-	smlabb r10,r5,r7,r11
+	smulbb r10,r11,r7
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	mul r10,r0
+	smulbb r10,r10,r5
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	smlatt r7,r5,r7,r11
+	smulbt r7,r11,r7
 	mul r9,r7,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r7
 	lsr r7,r9,#18
-	mul r7,r0
+	smulbt r7,r7,r5
 	mul r9,r7,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r7
 	lsr r7,r9,#2
 	pkhbt r5, r10, r7
 	
-	smlabb r10,r6,r8,r11
+	smulbb r10,r11,r8
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	mul r10,r0
+	smulbb r10,r10,r6
 	mul r9,r10,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r10
 	lsr r10,r9,#18
-	smlatt r8,r6,r8,r11
+	smulbt r8,r11,r8
 	mul r9,r8,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r8
 	lsr r8,r9,#18
-	mul r8,r0
+	smulbt r8,r8,r6
 	mul r9,r8,r12
 	ubfx r9,r9,#0,#18
 	mla r9,r9,r14,r8
 	lsr r8,r9,#2
 	pkhbt r6, r10, r8
-    pop {r0,r10}
+    pop {r10}
     stm r0!,{r3,r4,r5,r6}
 
     sub r10,#1

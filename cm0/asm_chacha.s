@@ -1,338 +1,6 @@
 .align 2
 .thumb
 
-string:
-  .ascii "expand 32-byte k"
-
-.equ	x0	,  0*4
-.equ	x1	,  1*4
-.equ	x2	,  2*4
-.equ	x3	,  3*4
-.equ	x4	,  4*4
-.equ	x5	,  5*4
-.equ	x6	,  6*4
-.equ	x7	,  7*4
-.equ	x8	,  8*4
-.equ	x9	,  9*4
-.equ	x10	,  10*4
-.equ	x11	,  11*4
-.equ	x12	,  12*4
-.equ	x13	,  13*4
-.equ	x14 ,  14*4
-.equ	x15 ,  15*4
-
-.macro QUARTERROUND a b c d     @r7
-
-    add \a,\b
-    eor \d,\a
-    mov r7,\d
-    lsl \d,#16
-    lsr r7,#16
-    orr \d,r7
-    
-    add \c,\d
-    eor \b,\c
-    mov r7,\b
-    lsl \b,#12
-    lsr r7,#20
-    orr \b,r7
-
-    add \a,\b
-    eor \d,\a
-    mov r7,\d
-    lsl \d,#8
-    lsr r7,#24
-    orr \d,r7
-
-    add \c,\d
-    eor \b,\c
-    mov r7,\b
-    lsl \b,#7
-    lsr r7,#25
-    orr \b,r7
-    
-
-.endm
-
-
-
-@----------------------------------------------------------------------------
-@
-@ static int crypto_core_chacha20(unsigned char *out,const unsigned char *in,const unsigned char *k,
-@                                   const unsigned char *c)
-
-
-asm_crypto_core_chacha20:
-    push {r4-r7,lr}
-
-
-
-
-    mov r14,r0
-    ldr r4,[r3]
-    ldr r5,[r3,#4]
-    ldr r6,[r3,#8]
-    ldr r7,[r3,#12]
-    stm r0,{r4,r5,r6,r7}
-
-
-    ldr r4,[r1]
-    ldr r5,[r1,#4]
-    ldr r6,[r1,#8]
-    ldr r7,[r1,#12]
-    stm r0,{r4,r5,r6,r7}
-    ldr r4,[r1,#16]
-    ldr r5,[r1,#20]
-    ldr r6,[r1,#24]
-    ldr r7,[r1,#28]
-    stm r0,{r4,r5,r6,r7}
-
-
-    ldr r4,[r2,#8]
-    ldr r5,[r2,#12]
-    ldr r6,[r2]
-    ldr r7,[r2,#4]
-    stm r0,{r4,r5,r6,r7}
-
-    mov r11,r3
-    mov r12,r1
-    mov r8,r2
-    mov r5,#9 
-    mov r0,r14
-    
-round_loop:
-    
-    ldr r1,[r0,#x0]
-    ldr r2,[r0,#x4]
-    ldr r3,[r0,#x8]
-    ldr r4,[r0,#x12]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x0]
-    str r2,[r0,#x4]
-    str r3,[r0,#x8]
-    str r4,[r0,#x12]
-
-    ldr r1,[r0,#x1]
-    ldr r2,[r0,#x5]
-    ldr r3,[r0,#x9]
-    ldr r4,[r0,#x13]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x1]
-    str r2,[r0,#x5]
-    str r3,[r0,#x9]
-    str r4,[r0,#x13]
-
-    ldr r1,[r0,#x2]
-    ldr r2,[r0,#x6]
-    ldr r3,[r0,#x10]
-    ldr r4,[r0,#x14]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x2]
-    str r2,[r0,#x6]
-    str r3,[r0,#x10]
-    str r4,[r0,#x14]
-
-    ldr r1,[r0,#x3]
-    ldr r2,[r0,#x7]
-    ldr r3,[r0,#x11]
-    ldr r4,[r0,#x15]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x3]
-    str r2,[r0,#x7]
-    str r3,[r0,#x11]
-    str r4,[r0,#x15]
-
-    ldr r1,[r0,#x0]
-    ldr r2,[r0,#x5]
-    ldr r3,[r0,#x10]
-    ldr r4,[r0,#x15]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x0]
-    str r2,[r0,#x5]
-    str r3,[r0,#x10]
-    str r4,[r0,#x15]
-
-
-
-    ldr r1,[r0,#x1]
-    ldr r2,[r0,#x6]
-    ldr r3,[r0,#x11]
-    ldr r4,[r0,#x12]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x1]
-    str r2,[r0,#x6]
-    str r3,[r0,#x11]
-    str r4,[r0,#x12]
-
-
-
-    ldr r1,[r0,#x2]
-    ldr r2,[r0,#x7]
-    ldr r3,[r0,#x8]
-    ldr r4,[r0,#x13]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x2]
-    str r2,[r0,#x7]
-    str r3,[r0,#x8]
-    str r4,[r0,#x13]
-
-
-    ldr r1,[r0,#x3]
-    ldr r2,[r0,#x4]
-    ldr r3,[r0,#x9]
-    ldr r4,[r0,#x14]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x3]
-    str r2,[r0,#x4]
-    str r3,[r0,#x9]
-    str r4,[r0,#x14]
-
-    sub r5,#1
-    beq end
-    bal round_loop
-end:
-     ldr r1,[r0,#x0]
-    ldr r2,[r0,#x4]
-    ldr r3,[r0,#x8]
-    ldr r4,[r0,#x12]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x0]
-    str r2,[r0,#x4]
-    str r3,[r0,#x8]
-    str r4,[r0,#x12]
-
-    ldr r1,[r0,#x1]
-    ldr r2,[r0,#x5]
-    ldr r3,[r0,#x9]
-    ldr r4,[r0,#x13]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x1]
-    str r2,[r0,#x5]
-    str r3,[r0,#x9]
-    str r4,[r0,#x13]
-
-    ldr r1,[r0,#x2]
-    ldr r2,[r0,#x6]
-    ldr r3,[r0,#x10]
-    ldr r4,[r0,#x14]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x2]
-    str r2,[r0,#x6]
-    str r3,[r0,#x10]
-    str r4,[r0,#x14]
-
-    ldr r1,[r0,#x3]
-    ldr r2,[r0,#x7]
-    ldr r3,[r0,#x11]
-    ldr r4,[r0,#x15]
-    QUARTERROUND r1,r2,r3,r4
-    str r1,[r0,#x3]
-    str r2,[r0,#x7]
-    str r3,[r0,#x11]
-    str r4,[r0,#x15]
-
-    ldr r1,[r0,#x0]
-    ldr r2,[r0,#x5]
-    ldr r3,[r0,#x10]
-    ldr r4,[r0,#x15]
-    QUARTERROUND r1,r2,r3,r4
-    mov r5,r11
-    ldr r5,[r5]
-    add r1,r5
-    str r1,[r0,#x0]
-    mov r6,r12
-    ldr r5,[r6,#4]
-    add r2,r5
-    str r2,[r0,#x5]
-    ldr r5,[r6,#24]
-    add r3,r5
-    str r3,[r0,#x10]
-    mov r5,r8
-    ldr r5,[r5,#4]
-    add r4,r5
-    str r4,[r0,#x15]
-
-
-
-    ldr r1,[r0,#x1]
-    ldr r2,[r0,#x6]
-    ldr r3,[r0,#x11]
-    ldr r4,[r0,#x12]
-    QUARTERROUND r1,r2,r3,r4
-    mov r5,r11
-    ldr r5,[r5,#4]
-    add r1,r5
-    str r1,[r0,#x1]
-    mov r6,r12
-    ldr r5,[r6,#8]
-    add r2,r5
-    str r2,[r0,#x6]
-    ldr r5,[r6,#28]
-    add r3,r5
-    str r3,[r0,#x11]
-    mov r5,r8
-    ldr r5,[r5,#8]
-    add r4,r5
-    str r4,[r0,#x12]
-
-
-
-    ldr r1,[r0,#x2]
-    ldr r2,[r0,#x7]
-    ldr r3,[r0,#x8]
-    ldr r4,[r0,#x13]
-    QUARTERROUND r1,r2,r3,r4
-    mov r5,r11
-    ldr r5,[r5,#8]
-    add r1,r5
-    str r1,[r0,#x2]
-    mov r6,r12
-    ldr r5,[r6,#12]
-    add r2,r5
-    str r2,[r0,#x7]
-    ldr r5,[r6,#16]
-    add r3,r5
-    str r3,[r0,#x8]
-    mov r5,r8
-    ldr r5,[r5,#12]
-    add r4,r5
-    str r4,[r0,#x13]
-
-
-    ldr r1,[r0,#x3]
-    ldr r2,[r0,#x4]
-    ldr r3,[r0,#x9]
-    ldr r4,[r0,#x14]
-    QUARTERROUND r1,r2,r3,r4
-    mov r5,r11
-    ldr r5,[r5,#12]
-    add r1,r5
-    str r1,[r0,#x3]
-    mov r6,r12
-    ldr r5,[r6]
-    add r2,r5
-    str r2,[r0,#x4]
-    ldr r5,[r6,#20]
-    add r3,r5
-    str r3,[r0,#x9]
-    mov r5,r8
-    ldr r5,[r5]
-    add r4,r5
-    str r4,[r0,#x14]
-        
-
-    
-
-
-    pop {r4-r7,pc}
-    bx lr
-try:
-    push {lr}
-
-    pop {pc}
-
-
-
 
 @----------------------------------------------------------------------------
 @
@@ -359,37 +27,2828 @@ asm_csc_for:
 
 
 
+
+
 @----------------------------------------------------------------------------
 @
-@ void asm_crypto_core(unsigned char *out, unsigned char *k,unsigned char *in)
-@    
+@ void asm_init(unsigned char *out, unsigned char *k,unsigned char *in)
+@ 
 
-.global	asm_crypto_core;
-.type	asm_crypto_core, %function
-asm_crypto_core:
+
+.global asm_init;
+.type asm_init, %function
+asm_init:
     push {r4-r7,lr}
-    mov r4,r8
-    mov r5,r11
-    mov r6,r12
-    mov r7,r14
-    push {r4-r7}
 
-    ldr r3, =string
-    bl asm_crypto_core_chacha20
-    
-    pop {r4-r7}
-    mov r8,r4
-    mov r11,r5
-    mov r12,r6
-    mov r14,r7
+
+    ldm r3,{r4,r5,r6,r7}
+    stm r0,{r4,r5,r6,r7}
+
+    ldm r1,{r4,r5,r6,r7}
+    stm r0,{r4,r5,r6,r7}
+    ldm r1,{r4,r5,r6,r7}
+    stm r0,{r4,r5,r6,r7}
+
+
+   
+    ldm r2,{r6,r7}
+    ldm r2,{r4,r5}    
+    stm r0,{r4,r5,r6,r7}
+
     pop {r4-r7,pc}
     bx lr
+    
+
+
+@----------------------------------------------------------------------------
+@
+@ void asm_quarterround(uint32_t *x)
+@ 
+.global asm_quarterround
+.func asm_quarterround
+
+asm_quarterround:
+	// Save low registers
+	push {r4-r7}
+
+	// Copy high to low registers
+	mov	r3, r8
+	mov	r4, r9
+	mov	r5, r10
+	mov	r6, r11
+	mov	r7, r12
+	// Save high registers
+	push {r3-r7}
+	// See Readme for explanation of
+	// register allocation.
+
+	// Rotate constants are buffered as good as possible
+	mov	r5, #16
+	mov	r6, #20
+	mov	r7, #24
+
+	// Round 1
+	//=======================================
+	ldr	r1, [r0]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 2
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 3
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 4
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 5
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 6
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 7
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 8
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+
+	// Round 9
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	mov	r10, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	mov	r8, r3
+	mov	r11, r4
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r3
+	mov	r12, r4
+
+	//=======================================
+	
+	// Round 10
+	//=======================================
+	ldr	r1, [r0]
+	mov	r3, r8
+	mov	r4, r10
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #32]
+	str	r4, [r0, #48]
+
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	ldr	r2, [r0, #20]
+	mov	r3, r9
+	mov	r4, r11
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r10, r2
+	str	r3, [r0, #36]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	ldr	r2, [r0, #24]
+	ldr	r3, [r0, #40]
+	mov	r4, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r9, r2
+	mov	r12, r3
+	str	r4, [r0, #56]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #28]
+	ldr	r3, [r0, #44]
+	ldr	r4, [r0, #60]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	mov	r8, r2
+	mov	r11, r3
+	
+	//=======================================
+
+	ldr	r1, [r0, #0]
+	mov	r2, r10
+	mov	r3, r12
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #0]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #20]
+	str	r3, [r0, #40]
+	str	r4, [r0, #60]
+	
+	//=======================================
+
+	ldr	r1, [r0, #4]
+	mov	r2, r9
+	mov	r3, r11
+	ldr	r4, [r0, #48]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #4]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #24]
+	str	r3, [r0, #44]
+	str	r4, [r0, #48]
+	
+	//=======================================
+
+	ldr	r1, [r0, #8]
+	mov	r2, r8
+	ldr	r3, [r0, #32]
+	ldr	r4, [r0, #52]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #8]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #28]
+	str	r3, [r0, #32]
+	str	r4, [r0, #52]
+	
+	//=======================================
+
+	ldr	r1, [r0, #12]
+	ldr	r2, [r0, #16]
+	ldr	r3, [r0, #36]
+	ldr	r4, [r0, #56]
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]),16);
+	eor	r4, r1
+	ror	r4, r5
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]),12);
+	eor	r2, r3
+	ror	r2, r6
+	// x[a] = PLUS(x[a],x[b]);
+	add	r1, r2
+	// x[d] = ROTATE(XOR(x[d],x[a]), 8);
+	eor	r4, r1
+	str	r1, [r0, #12]
+	ror	r4, r7
+	// x[c] = PLUS(x[c],x[d]);
+	add	r3, r4
+	// x[b] = ROTATE(XOR(x[b],x[c]), 7);
+	eor	r2, r3
+	mov	r1, #25
+	ror	r2, r1
+
+	str	r2, [r0, #16]
+	str	r3, [r0, #36]
+	str	r4, [r0, #56]
+
+	//=======================================
+
+	// restore high registers
+	pop {r3-r7}
+	// Copy low to high registers
+	mov	r8, r3
+	mov	r9, r4
+	mov	r10, r5
+	mov	r11, r6
+	mov	r12, r7
+
+	pop {r4-r7}
+	bx lr
+.endfunc
 
 
 
+@----------------------------------------------------------------------------
+@
+@ void asm_add_and_store(unsigned char *out, uint32_t *x,uint32_t *j)
+@ 
+.global asm_add_and_store
+.func asm_add_and_store
 
+asm_add_and_store:
+	push {r4-r6}
+	
+	//=======================================
+	ldr	r3, [r1]
+	ldr	r4, [r2]
+	
+	ldr	r5, [r1, #4]
+	ldr	r6, [r2, #4]
+	
+	add r3, r4
+	str	r3, [r0]
 
+	ldr	r3, [r1, #8]
+	ldr	r4, [r2, #8]
 
+	add r5, r6
+	str	r5, [r0, #4]
 
+	ldr	r5, [r1, #12]
+	ldr	r6, [r2, #12]
+	
+	add r3, r4
+	str	r3, [r0, #8]
+
+	ldr	r3, [r1, #16]
+	ldr	r4, [r2, #16]
+
+	add r5, r6
+	str	r5, [r0, #12]
+
+	ldr	r5, [r1, #20]
+	ldr	r6, [r2, #20]
+	
+	add r3, r4
+	str	r3, [r0, #16]
+
+	ldr	r3, [r1, #24]
+	ldr	r4, [r2, #24]
+
+	add r5, r6
+	str	r5, [r0, #20]
+
+	ldr	r5, [r1, #28]
+	ldr	r6, [r2, #28]
+	
+	add r3, r4
+	str	r3, [r0, #24]
+
+	ldr	r3, [r1, #32]
+	ldr	r4, [r2, #32]
+
+	add r5, r6
+	str	r5, [r0, #28]
+
+	ldr	r5, [r1, #36]
+	ldr	r6, [r2, #36]
+	
+	add r3, r4
+	str	r3, [r0, #32]
+
+	ldr	r3, [r1, #40]
+	ldr	r4, [r2, #40]
+
+	add r5, r6
+	str	r5, [r0, #36]
+
+	ldr	r5, [r1, #44]
+	ldr	r6, [r2, #44]
+	
+	add r3, r4
+	str	r3, [r0, #40]
+
+	ldr	r3, [r1, #48]
+	ldr	r4, [r2, #48]
+
+	add r5, r6
+	str	r5, [r0, #44]
+
+	ldr	r5, [r1, #52]
+	ldr	r6, [r2, #52]
+	
+	add r3, r4
+	str	r3, [r0, #48]
+
+	ldr	r3, [r1, #56]
+	ldr	r4, [r2, #56]
+
+	add r5, r6
+	str	r5, [r0, #52]
+
+	ldr	r5, [r1, #60]
+	ldr	r6, [r2, #60]
+	
+	add r3, r4
+	str	r3, [r0, #56]
+
+	ldr	r3, [r1, #64]
+	ldr	r4, [r2, #64]
+
+	add r5, r6
+	str	r5, [r0, #60]
+
+	add r3, r4
+	str	r3, [r0, #64]
+	
+	//=======================================
+
+	pop {r4-r6}
+	bx lr
+.endfunc
 
 

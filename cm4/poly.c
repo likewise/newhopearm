@@ -65,7 +65,7 @@ void poly_uniform(poly *a, const unsigned char *seed)
   unsigned int pos=0, ctr=0;
   uint16_t val;
   uint64_t state[25];
-  unsigned int nblocks=16;
+  unsigned int nblocks=4;
   uint8_t buf[SHAKE128_RATE*nblocks];
 
   shake128_absorb(state, seed, NEWHOPE_SEEDBYTES);
@@ -74,9 +74,9 @@ void poly_uniform(poly *a, const unsigned char *seed)
 
   while(ctr < PARAM_N)
   {
-    val = (buf[pos] | ((uint16_t) buf[pos+1] << 8)) & 0x3fff; // Specialized for q = 12889
-    if(val < PARAM_Q)
-      a->v[ctr++] = val;
+    val = (buf[pos] | ((uint16_t) buf[pos+1] << 8)); 
+    if(val < 5*PARAM_Q)
+      a->v[ctr++] = barrett_reduce(val);
     pos += 2;
     if(pos > SHAKE128_RATE*nblocks-2)
     {
@@ -118,17 +118,6 @@ void poly_getnoise(poly *r, unsigned char *seed, unsigned char nonce)
   }
 }
 
-/*void poly_pointwise(poly *r, const poly *a, const poly *b)*/
-/*{*/
-  /*int i;*/
-  /*uint16_t t;*/
-  /*for(i=0;i<PARAM_N;i++)*/
-  /*{*/
-    /*t       = montgomery_reduce(3186*b->v[i]); [> t is now in Montgomery domain <]*/
-    /*r->v[i] = montgomery_reduce(a->v[i] * t); [> r->v[i] is back in normal domain <]*/
-  /*}*/
-/*}*/
-
 void poly_add(poly *r, const poly *a, const poly *b)
 {
   int i;
@@ -142,13 +131,14 @@ void poly_bitrev(poly *r)
 }
 void poly_ntt(poly *r)
 {
-  mul_coefficients(r->v, psis_bitrev_montgomery); 
+  mul_coeff(r->v, omegas_montgomery); 
   ntt((uint16_t *)r->v, omegas_montgomery);
 }
 
 void poly_invntt(poly *r)
 {
   ntt((uint16_t *)r->v, omegas_inv_montgomery);
-  mul_coefficients(r->v, psis_inv_montgomery);
+  mul_coefficients(r->v,psis_inv_montgomery);
+  
 }
 
