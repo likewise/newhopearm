@@ -92,7 +92,8 @@ void newhope_keygen(poly *send, poly *sk)
 {
     unsigned char  seed[NEWHOPE_SEEDBYTES];
 
-    randombytes(seed, 2);
+    randombytes(seed, 2);    
+    sha3256(seed, seed, NEWHOPE_SEEDBYTES);
     newhope_keygen_internal(send, sk,seed);
 
     encode_ap(send, seed);

@@ -55,5 +55,3 @@ b = [chr(int.from_bytes(x,'big')) for x in b]
 print("> "+''.join(b) , file=sys.stderr)
 
 
-'''while dev.inWaiting():
-  print(int.from_bytes(dev.read(1),'big'))  '''

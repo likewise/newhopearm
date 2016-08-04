@@ -20,11 +20,11 @@ depending on the script uploaded, we provide two python scripts.
 These can be found in the 'scripts' sub-directory.
 
 * Proof-of-concept binaries
-    + Server test: `make runServer` invokes the NewHope server side test. It loads the code into the device memory and calls the test_server python-script to test the communication and computations of the server-side code on the device against results taken from the reference implementation. 
-    + Client test: `make runClient` invokes the NewHope client side test. It loads the code into the device memory and calls the test_client python-script to test the communication and computations of the client-side code on the device against results taken from the reference implementation. 
+    + Server test: `./test_server` loads the NewHope server side into the device memory. Afterwards the test_server python-script needs to be executed to test the communication and computations of the server-side code on the device against results taken from the reference implementation. 
+    + Client test: `./test_client` loads the NewHope client side into the device memory. Afterwards the test_client python-script to test the communication and computations of the client-side code on the device against results taken from the reference implementation. 
 * Measurement binaries
-    + Speed measurements: `make runSpeed` invokes cycle count measurements. It loads the code into the device memory and calls the monitor script to print the output of the device.
-    + Memory usage measurement: `make runMemsize` invokes the memory measurements. The ROM usage can be determined by running `arm-none-eabi-size -t tests/libnewhopearm.a`.
+    + Speed measurements: `./speed.sh` invokes cycle count measurements. It loads the code into the device memory and calls the monitor script to print the output of the device.
+    + Memory usage measurement: `./mem.sh` invokes the memory measurements. The ROM usage can be determined by running `arm-none-eabi-size -t libnewhopearm.a`.
 
 # Communication-API
 
@@ -57,9 +57,9 @@ Due to the usage of two different libraries we encountered two pitfalls the code
 
 
 
-* If the host and the Cortex-M0 get out of sync, `make runClient` should be called.  The terminal will prompt `> Waiting for signal..`. If the reset button is pressed the host and the Cortex-M0 should be in sync again. 
+* If the host and the Cortex-M0 get out of sync, `./test_client` should be called.  The terminal will prompt `> Waiting for signal..`. If the reset button is pressed the host and the Cortex-M0 should be in sync again. 
 
-* If the output of `make runMemsize` is not printed, calling `make runSpeed` and two consecutive times `make runMemsize` should solve that issue. 
+* If the output of `./mem.sh` is not printed, calling `./speed.sh` and two consecutive times `./mem.sh` should solve that issue. 
 
 
   
